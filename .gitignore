@@ -1,3 +1,5 @@
 .vscode
 Points/*
 comp/__pycache__/*
+*.pkl
+__pycache__/*

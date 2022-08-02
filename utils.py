@@ -159,12 +159,6 @@ def normalize_maxmin(Mx, axis=2):
     return Mx
 
 
-# def accuracy(output, labels):
-#     preds = output.max(1)[1].type_as(labels)
-#     correct = preds.eq(labels).double()
-#     correct = correct.sum()
-#     return correct / len(labels)
-
 
 def loss_polt(x, train_loss_list, val_loss_list, train_acc_list, val_acc_list):
     '''
