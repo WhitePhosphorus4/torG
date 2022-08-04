@@ -1,5 +1,8 @@
 .vscode
-Points/*
-comp/__pycache__/*
 *.pkl
-__pycache__/*
+
+__pycache__
+comp/__pycache__/*
+
+Points/*
+/data
