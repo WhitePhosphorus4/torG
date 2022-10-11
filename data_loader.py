@@ -3,7 +3,7 @@ import scipy.sparse as sp
 import torch
 from utils import *
 from torch_geometric.datasets import Planetoid
-
+import random
 import sys
 import pickle as pkl
 import networkx as nx
@@ -140,21 +140,21 @@ def load_LiDAR_data(txtname='./Points/SPP.txt', num_points=3000, Spatialwight=0.
     return featureadj, features, labels, idx_train, idx_val, idx_test
 
 
-def load_txt_data(path='./Points/', data_name='sptest', num_points=3000, each_class_num=50):
+def load_txt_data(path='./Points/', data_name='SPP', num_points=None, each_class_num=50, val_num=1000, test_num=5000):
     '''load points data'''
     print('Loading {} dataset....'.format(data_name))
-    ADJ = np.load(path+data_name+'_adj.npy')[:num_points,:num_points]
-    Feature = np.load(path+data_name+'_features.npy')[:num_points,:]
+    all = np.load(path+data_name+'_adj.npy')[:, :]
+    if num_points is None:
+        num_points = all.shape[0]
+    ADJ = sp.coo_matrix(all[:num_points, :num_points], dtype=np.float32)
+    Feature = np.load(path+data_name+'_features.npy')[:num_points, :]
 
-    ADJ = torch.FloatTensor(ADJ)
+    # ADJ = torch.FloatTensor(ADJ)
+    ADJ = sparse_mx_to_torch_sparse_tensor(ADJ)
     features = torch.FloatTensor(Feature[:, :6])
     labels = torch.LongTensor(Feature[:, -1])
     unique, count = np.unique(labels, return_counts=True)
     print('The number of total each class is {}'.format(dict(zip(unique,count))))
-
-    # idx_train = range(int(0.4*num_points))
-    # idx_val = range(int(0.4*num_points), int(0.8*num_points))
-    # idx_test = range(int(0.8*num_points), int(1*num_points))
 
     # fix each class num
     cou = [0 for i in range(len(unique))]
@@ -164,8 +164,11 @@ def load_txt_data(path='./Points/', data_name='sptest', num_points=3000, each_cl
         if cou[labels[i]-1] <= each_class_num:
             idx_train.append(i)
     r = [i for i in range(num_points) if i not in idx_train]
-    idx_val = r[:int(0.5*len(r))]
-    idx_test = r[int(0.5*len(r)):]
+    idx_val = random.sample(list(r), int(val_num))
+    r = [i for i in r if i not in idx_val]
+    idx_test = random.sample(list(r), int(test_num))
+    # idx_val = r[:int(0.5*len(r))]
+    # idx_test = r[int(0.5*len(r)):]
 
     idx_train = torch.LongTensor(idx_train)
     idx_val = torch.LongTensor(idx_val)
