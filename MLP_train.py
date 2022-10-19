@@ -25,7 +25,7 @@ parser.add_argument('--fastmode', action='store_true', default=False, help='Vali
 # parser.add_argument('--sparse', action='store_true', default=False, help='GAT with sparse version or not.')
 parser.add_argument('--seed', type=int, default=42, help='Random seed.')
 parser.add_argument('--epochs', type=int, default=5000, help='Number of epochs to train.')
-parser.add_argument('--lr', type=float, default=1e-3, help='Initial learning rate.5e-3')
+parser.add_argument('--lr', type=float, default=5e-3, help='Initial learning rate.5e-3')
 parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay (L2 loss on parameters).')
 # parser.add_argument('--hidden', type=int, default=16, help='Number of hidden units.')
 # parser.add_argument('--nb_heads', type=int, default=8, help='Number of head attentions.')
@@ -53,7 +53,7 @@ if args.dataset == 'cora':
 elif args.dataset.startswith('PLT'):
     adj, features, labels, idx_train, idx_val, idx_test = load_Planetoid_data(args.dataset)
 elif args.dataset == 'LiDAR':
-    adj, features, labels, idx_train, idx_val, idx_test = load_txt_data(num_points=10000)   
+    adj, features, labels, idx_train, idx_val, idx_test = load_txt_data(data_name='UH')   
 elif args.dataset == 'test':
     adj, features, labels, idx_train, idx_val, idx_test = load_citation()
 else:

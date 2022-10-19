@@ -23,20 +23,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--no-cuda', action='store_true', default=False, help='Disables CUDA training.')
 parser.add_argument('--fastmode', action='store_true', default=False, help='Validate during training pass.')
 parser.add_argument('--seed', type=int, default=42, help='Random seed.')
-parser.add_argument('--epochs', type=int, default=5000, help='Number of epochs to train.')
+parser.add_argument('--epochs', type=int, default=500000, help='Number of epochs to train.')
 parser.add_argument('--alpha', type=float, default=0.2, help='Alpha for the leaky_relu.')
-parser.add_argument('--patience', type=int, default=200, help='Patience')
+parser.add_argument('--patience', type=int, default=1000, help='Patience')
 parser.add_argument('--model', type=str, default="GCNII", help='choose the version of GAT.')
 parser.add_argument('--dataset', type=str, default='LiDAR', help='choose the dataset, name should be <setname>-<datasetname>-<loadtype>')
 
 parser.add_argument('--lamda', type=float, default=0.6, help='lamda.')
-parser.add_argument('--wd1', type=float, default=5e-3, help='weight decay (L2 loss on parameters).')
-parser.add_argument('--wd2', type=float, default=5e-4, help='weight decay (L2 loss on parameters).')
-parser.add_argument('--lr', type=float, default=1e-3, help='Initial learning rate.5e-3')
+parser.add_argument('--wd1', type=float, default=5e-2, help='weight decay (L2 loss on parameters).')
+parser.add_argument('--wd2', type=float, default=5e-3, help='weight decay (L2 loss on parameters).')
+parser.add_argument('--lr', type=float, default=1e-2, help='Initial learning rate.5e-3')
 parser.add_argument('--dropout', type=float, default=0.1, help='Dropout rate (1 - keep probability).')
 parser.add_argument('--variant', action='store_true', default=False, help='GCN* model.')
-parser.add_argument('--layer', type=int, default=4, help='Number of layers.')
-parser.add_argument('--hidden', type=int, default=256, help='Number of hidden units.')
+parser.add_argument('--layer', type=int, default=8, help='Number of layers.')
+parser.add_argument('--hidden', type=int, default=128, help='Number of hidden units.')
 
 
 args = parser.parse_args()
@@ -54,7 +54,7 @@ if args.dataset == 'cora':
 elif args.dataset.startswith('PLT'):
     adj, features, labels, idx_train, idx_val, idx_test = load_Planetoid_data(args.dataset)
 elif args.dataset == 'LiDAR':
-    adj, features, labels, idx_train, idx_val, idx_test = load_txt_data(num_points=10000, data_name="sptest")   
+    adj, features, labels, idx_train, idx_val, idx_test = load_txt_data(data_name="UHnoL")   
 elif args.dataset == 'test':
     adj, features, labels, idx_train, idx_val, idx_test = load_citation()
 else:

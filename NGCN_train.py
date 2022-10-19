@@ -25,17 +25,17 @@ parser.add_argument('--fastmode', action='store_true', default=False, help='Vali
 parser.add_argument('--sparse', action='store_true', default=False, help='GAT with sparse version or not.')
 parser.add_argument('--seed', type=int, default=42, help='Random seed.')
 parser.add_argument('--epochs', type=int, default=5000, help='Number of epochs to train.')
-parser.add_argument('--patience', type=int, default=100, help='Patience')
+parser.add_argument('--patience', type=int, default=1000, help='Patience')
 parser.add_argument('--model', type=str, default="NGCN", help='choose the version of GAT.')
 parser.add_argument('--dataset', type=str, default='LiDAR', help='choose the dataset, name should be <setname>-<datasetname>-<loadtype>')
 
 parser.add_argument('--lr', type=float, default=5e-3, help='Initial learning rate.5e-3')
-parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay (L2 loss on parameters).')
-parser.add_argument('--hidden', type=int, default=8, help='Number of hidden units.')
+parser.add_argument('--weight_decay', type=float, default=5e-3, help='Weight decay (L2 loss on parameters).')
+parser.add_argument('--hidden', type=int, default=32, help='Number of hidden units.')
 # parser.add_argument('--nb_heads', type=int, default=8, help='Number of head attentions.')
-parser.add_argument('--dropout', type=float, default=0.5, help='Dropout rate (1 - keep probability).')
+parser.add_argument('--dropout', type=float, default=0.1, help='Dropout rate (1 - keep probability).')
 parser.add_argument('--alpha', type=float, default=0.2, help='Alpha for the leaky_relu.')
-parser.add_argument('--K', type=int, default=5 , help='K.')
+parser.add_argument('--K', type=int, default=5, help='K.')
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -52,7 +52,7 @@ if args.dataset == 'cora':
 elif args.dataset.startswith('PLT'):
     adj, features, labels, idx_train, idx_val, idx_test = load_Planetoid_data(args.dataset)
 elif args.dataset == 'LiDAR':
-    adj, features, labels, idx_train, idx_val, idx_test = load_txt_data(num_points=5000, data_name="sptest")   
+    adj, features, labels, idx_train, idx_val, idx_test = load_txt_data(data_name="UHnoL")   
 elif args.dataset == 'test':
     adj, features, labels, idx_train, idx_val, idx_test = load_citation()
 else:
@@ -120,7 +120,7 @@ def train(epoch):
           'acc_val: {:.4f}'.format(acc_val.data.item()),
           'time: {:.4f}s'.format(time.time() - t))
 
-    return loss_val.data.item()
+    return loss_val.data.item(), acc_val.data.item()
 
 
 def compute_test(model, features, adj, idx_test):
@@ -147,15 +147,21 @@ if __name__ == "__main__":
     # Train model
     t_total = time.time()
     loss_values = []
+    acc_values = []
     bad_counter = 0
-    best = args.epochs + 1
+    # best = args.epochs + 1
+    best = -10086
     best_epoch = 0
     for epoch in range(args.epochs):
-        loss_values.append(train(epoch))
+        loss, acc = train(epoch)
+        loss_values.append(loss)
+        acc_values.append(acc)
 
         torch.save(model.state_dict(), '{}.pkl'.format(epoch))
-        if loss_values[-1] < best:
-            best = loss_values[-1]
+        # if loss_values[-1] < best:
+        #     best = loss_values[-1]
+        if acc_values[-1] > best:
+            best = acc_values[-1]
             best_epoch = epoch
             bad_counter = 0
         else:
